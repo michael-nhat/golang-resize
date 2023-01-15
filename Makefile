@@ -1,9 +1,9 @@
 resize: clean
 	# go get -u -v github.com/valyala/fasthttp
-	go build ./src/resize.go 
+	go build ./src/main.go 
 
 clean:
 	rm -f resize
 
 build:
-	go build ./src/resize.go
+	go build ./src/
