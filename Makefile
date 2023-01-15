@@ -1,5 +1,5 @@
 helloworldserver: clean
-	go get -u github.com/valyala/fasthttp
+	go install github.com/valyala/fasthttp@latest
 	go build
 
 clean:
