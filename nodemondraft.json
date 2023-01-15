@@ -7,9 +7,9 @@
   "restartable": "rs",
 
   "ext": "go",
-  "option": {
-    "exec": "./resize"
-  },
+  // "option": {
+  //   "exec": "./resize"
+  // },
   "exec": "./resize",
   "signal": "SIGTERM"
 }

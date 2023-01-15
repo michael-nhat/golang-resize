@@ -1,6 +1,9 @@
-helloworldserver: clean
-	go install github.com/valyala/fasthttp@latest
-	go build
+resize: clean
+	# go get -u -v github.com/valyala/fasthttp
+	go build ./src/resize.go 
 
 clean:
-	rm -f helloworldserver
+	rm -f resize
+
+build:
+	go build ./src/resize.go
