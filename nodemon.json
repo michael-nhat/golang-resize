@@ -1,0 +1,12 @@
+{
+    "verbose": true,
+    "ignore": [
+        ".git",
+        ".idea"
+    ],
+    "execMap": {
+        "php": "go"
+    },
+    "restartable": false,
+    "ext": "go"
+}
