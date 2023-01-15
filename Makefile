@@ -6,4 +6,4 @@ clean:
 	rm -f resize
 
 build:
-	go build ./src/
+	go build ./src/main.go 

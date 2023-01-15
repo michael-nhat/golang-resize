@@ -1,7 +1,8 @@
 module.exports = {
   apps : [{
     name   : "resize",
-    script : "make build && ./resize",
+    script : "go run ./src/main.go",
+    // script : "go build ./src/main.go && ./resize",
     // watch: true,
     // kill_timeout : 1000,
     exec_interpreter: "none",
