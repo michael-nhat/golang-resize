@@ -118,13 +118,13 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string) {
 		}
 	} else {
 		if hRatio > wRatio {
-			buffer, err := bimg.NewImage(buffer).Resize(tarW, 0)
+			buffer, err := bimg.NewImage(buffer).Resize(0, tarH)
 			if err != nil {
 				utils.ErrRes(ctx, 500, "Resize")
 			}
 			Res(ctx, buffer)
 		} else {
-			buffer, err := bimg.NewImage(buffer).Resize(0, tarH)
+			buffer, err := bimg.NewImage(buffer).Resize(tarW, 0)
 			if err != nil {
 				utils.ErrRes(ctx, 500, "Resize")
 			}
