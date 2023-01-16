@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec ./resize",
+    "start": "pm2 start ecosystem.config.js",
     "del": "pm2 delete 0 ; pm2 save --force",
     "reload": "make build && ./resize"
   },

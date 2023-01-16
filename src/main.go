@@ -3,67 +3,71 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+
+	// "io/ioutil"
 	"log"
 	"os"
-	// "unsafe"
 
+	// "unsafe"
 	// "math/rand"
+	// "github.com/h2non/bimg"
 	"time"
 
-	"github.com/h2non/bimg"
 	"github.com/michael-nhat/golang-resize/src/draft"
+	"github.com/michael-nhat/golang-resize/src/resize"
 	"github.com/michael-nhat/golang-resize/src/utils"
 	"github.com/valyala/fasthttp"
 )
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
-	draft.TestRequest(ctx)
+	// prevent for browser auto job
+	switch string(ctx.Path()) {
+	case
+		"/",
+		"/favicon.ico":
+		return
+	}
+	// draft.TestRequest(ctx)
+	// return
+
 	var params = getArgF(ctx.QueryArgs().Peek)
 
 	var fileShortPath = params("img")
-	var filePathx, _ = os.Getwd()
-	var filePath = filePathx + "/src/jiangzi_tupian/" + string(fileShortPath)
-
-	fmt.Printf(filePath)
-
-	buffer, err := bimg.Read(filePath)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	var filePath = currentDir + "/src/jiangzi_tupian/" + string(fileShortPath)
+	// fmt.Printf("wtf: %s\n",string(params("wft")))
+	// fmt.Printf(filePath)
+	
+	if string(params("x-oss-process")) == "" {
+		resize.GetFile(ctx, filePath)
+	} else {
+		resize.Resize(filePath, ctx, string(params("x-oss-process")))
 	}
+	// fmt.Printf("Requested path is %q\n", ctx.Path())
 
-	newImage, err := bimg.NewImage(buffer).Resize(400, 600)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
-	bimg.Write("new.jpg", newImage)
-
-	fileBytes, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Fprintf(ctx, "Requested path is %q\n", params("img"))
-	var xossp = params("x-oss-process")
-	utils.Aa()
+	// var oss_params = utils.GetParams(xossp)
 
 	// ctx.Write(newImage)
 	// ctx.Response.Write(fileBytes)
 	// ctx.Response.SendFile(filePath)
-	ctx.Response.SetBody(buffer)
+	// ctx.Response.SetBody(buffer)
 	// ctx.SetContentType("application/octet-stream")
 	// ctx.SetContentType("image/jpeg")
-	ctx.Response.Header.Set("Content-Type", "image/jpeg")
-	// ctx.SetContentType("text/plain; charset=utf8")
+	// ctx.Response.Header.Set("Content-Type", "image/jpeg")
+	
 
-	UNUSED(xossp, fileBytes)
+	utils.UNUSED(
+		// xossp,
+		// fileBytes,
+
+		// oss_params,
+		draft.TestRequest,
+		utils.Aa)
 }
 
-func UNUSED(x ...interface{}) {}
-
 var (
-	addr     = flag.String("addr", ":8089", "TCP address to listen to")
-	compress = flag.Bool("compress", false, "Whether to enable transparent response compression")
+	addr          = flag.String("addr", ":8089", "TCP address to listen to")
+	compress      = flag.Bool("compress", false, "Whether to enable transparent response compression")
+	currentDir, _ = os.Getwd()
 )
 
 func main() {
