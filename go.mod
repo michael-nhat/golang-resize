@@ -4,6 +4,8 @@ go 1.18
 
 require github.com/valyala/fasthttp v1.44.0
 
+require github.com/go-redis/redis v6.15.9+incompatible // indirect
+
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/h2non/bimg v1.1.9

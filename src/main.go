@@ -13,6 +13,7 @@ import (
 	// "github.com/h2non/bimg"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/michael-nhat/golang-resize/src/draft"
 	"github.com/michael-nhat/golang-resize/src/resize"
 	"github.com/michael-nhat/golang-resize/src/utils"
@@ -36,11 +37,12 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	var filePath = currentDir + "/src/jiangzi_tupian/" + string(fileShortPath)
 	// fmt.Printf("wtf: %s\n",string(params("wft")))
 	// fmt.Printf(filePath)
-	
+	clientRedis.Set(filePath,filePath, 0)
+
 	if string(params("x-oss-process")) == "" {
 		resize.GetFile(ctx, filePath)
 	} else {
-		resize.Resize(filePath, ctx, string(params("x-oss-process")))
+		resize.Resize(filePath, ctx, string(params("x-oss-process")), clientRedis)
 	}
 	// fmt.Printf("Requested path is %q\n", ctx.Path())
 
@@ -53,7 +55,6 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	// ctx.SetContentType("application/octet-stream")
 	// ctx.SetContentType("image/jpeg")
 	// ctx.Response.Header.Set("Content-Type", "image/jpeg")
-	
 
 	utils.UNUSED(
 		// xossp,
@@ -65,6 +66,11 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 var (
+	clientRedis = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
 	addr          = flag.String("addr", ":8089", "TCP address to listen to")
 	compress      = flag.Bool("compress", false, "Whether to enable transparent response compression")
 	currentDir, _ = os.Getwd()

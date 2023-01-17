@@ -14,6 +14,7 @@ import (
 	// "github.com/clarketm/json"
 	// "time"
 
+	"github.com/go-redis/redis"
 	"github.com/h2non/bimg"
 	"github.com/michael-nhat/golang-resize/src/utils"
 	"github.com/valyala/fasthttp"
@@ -58,7 +59,7 @@ func GetFile(ctx *fasthttp.RequestCtx, filePath string) {
 	Res(ctx, buffer)
 }
 
-func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string) {
+func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, clientResdis *redis.Client) {
 	// aa := Oss_params{m: "skjd", w: 33, h: 33, limit: "skdjf"}
 	// utils.ErrRes(ctx, 501, "fdsf")
 	// return
@@ -102,11 +103,24 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string) {
 
 	if oss_params.m == "fill" {
 		if tarW > 0 && tarH > 0 {
-			buffer, err := bimg.NewImage(buffer).Resize(tarW, tarH)
-			if err != nil {
-				utils.ErrRes(ctx, 500, "Resize")
+			if hRatio < wRatio {
+				buffer, err := bimg.NewImage(buffer).Resize(tarW, tarH)
+				if err != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				Res(ctx, buffer)
+			} else {
+				buffer, err := bimg.NewImage(buffer).Enlarge(tarW, 0)
+				if err != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				buffer2, err2 := bimg.NewImage(buffer).Resize(tarW, tarH)
+				if err2 != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				Res(ctx, buffer2)
 			}
-			Res(ctx, buffer)
+
 		}
 	} else if oss_params.m == "fixed" {
 		if tarW > 0 && tarH > 0 {
