@@ -1,4 +1,4 @@
-start: 	clean deps build
+start: 	clean deps build-run
 
 clean:
 	rm -f resize

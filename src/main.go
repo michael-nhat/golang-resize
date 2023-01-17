@@ -34,7 +34,8 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	var params = getArgF(ctx.QueryArgs().Peek)
 
 	var fileShortPath = params("img")
-	var filePath = currentDir + "/src/jiangzi_tupian/" + string(fileShortPath)
+	var filePath = "/data/jiangzi_tupian/" + string(fileShortPath)
+	// var filePath = currentDir + "/data/jiangzi_tupian/" + string(fileShortPath)
 	// fmt.Printf("wtf: %s\n",string(params("wft")))
 	// fmt.Printf(filePath)
 	clientRedis.Set(filePath,filePath, 0)
