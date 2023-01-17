@@ -120,7 +120,6 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, client
 				}
 				Res(ctx, buffer2)
 			}
-
 		}
 	} else if oss_params.m == "fixed" {
 		if tarW > 0 && tarH > 0 {
