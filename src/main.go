@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 
 	// "io/ioutil"
 	"log"
@@ -27,12 +28,14 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		"/favicon.ico":
 		return
 	}
+	// draft.TestRequest(ctx)
 
-	var params = getArgF(ctx.QueryArgs().Peek)
+	params := getArgF(ctx.QueryArgs().Peek)
 
-	var fileShortPath = params("img")
-	var filePath = "/data/jiangzi_tupian/" + string(fileShortPath)
-	var xossp = string(params("x-oss-process"))
+	pathArr := strings.Split(string(ctx.Path()),"/");
+	fileShortPath := pathArr[len(pathArr) -1]
+	filePath := "/data/jiangzi_tupian/" + string(fileShortPath)
+	xossp := string(params("x-oss-process"))
 
 	fileStat, err := os.Stat(filePath)
 	if err != nil {

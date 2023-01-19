@@ -3,6 +3,7 @@ package draft
 import (
 	// "flag"
 	"fmt"
+	"strings"
 	// "log"
 
 	// "math/rand"
@@ -13,13 +14,11 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-
-
 func TestRequest(ctx *fasthttp.RequestCtx) {
-	fmt.Fprintf(ctx, "Hdedd!\n")
-	fmt.Fprintf(ctx, "RdequestURI is %q\n", ctx.RequestURI())
-	fmt.Fprintf(ctx, "Requested path is %q\n", ctx.Path())
-	fmt.Fprintf(ctx, "Query string is %q\n", ctx.QueryArgs().Peek("img"))
-	fmt.Fprintf(ctx, "\n")
+	fmt.Printf("Hdedd!\n")
+	fmt.Printf("RdequestURI is %q\n", ctx.RequestURI())
+	a := strings.Split(string(ctx.Path()),"/");
+	fmt.Printf("Requested path is %q\n", a[len(a) - 1])
+	fmt.Printf("Query string is %q\n", ctx.QueryArgs().Peek("img"))
 	ctx.SetContentType("text/plain; charset=utf8")
 }
