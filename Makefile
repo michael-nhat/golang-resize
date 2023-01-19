@@ -1,11 +1,14 @@
 start: 	clean deps build-run
 
 clean:
-	rm -f resize
+	rm -f main
 
 build-run:
 	go build ./src/main.go && ./main
 
+build:
+	go build ./src/main.go
+	
 install: 
 	go get -u -v github.com/valyala/fasthttp
 	go get -u github.com/h2non/bimg
@@ -14,6 +17,3 @@ install:
 
 deps: 
 	go mod tidy
-
-build:
-	go build ./src/main.go

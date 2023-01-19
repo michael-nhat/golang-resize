@@ -21,10 +21,6 @@ import (
 	// "github.com/clarketm/json"
 )
 
-// Exporting interface instead of struct
-// type Oss_params interface {
-// }
-// Struct is not exported
 type Oss_params struct {
 	w int
 	h int    // Defaults to 0
@@ -36,12 +32,9 @@ type Oss_params struct {
 	color string
 }
 
-// We are forced to call the constructor to get an instance of candidate
-// input is partial update
-func New_oss_params(raw Oss_params) bool {
-
-	// return Oss_params{name, 0}  // enforce the default value here
-	return true
+func ResCache(ctx *fasthttp.RequestCtx, buffer []byte, clientResdis *redis.Client, resizedFileInfoKey string) {
+	clientResdis.Set(resizedFileInfoKey, buffer, 0)
+	Res(ctx, buffer)
 }
 
 func Res(ctx *fasthttp.RequestCtx, buffer []byte) {
@@ -52,18 +45,13 @@ func Res(ctx *fasthttp.RequestCtx, buffer []byte) {
 func GetFile(ctx *fasthttp.RequestCtx, filePath string) {
 	buffer, err := bimg.Read(filePath)
 	if err != nil {
-		// fmt.Fprintln(os.Stderr, err)
 		utils.ErrRes(ctx, 404, "read file")
 		return
 	}
 	Res(ctx, buffer)
 }
 
-func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, clientResdis *redis.Client) {
-	// aa := Oss_params{m: "skjd", w: 33, h: 33, limit: "skdjf"}
-	// utils.ErrRes(ctx, 501, "fdsf")
-	// return
-
+func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, clientResdis *redis.Client, resizedFileInfoKey string) {
 	xossMap := make(map[string]string)
 	xossArr := strings.Split(xossString, ",")
 	for i := 1; i < len(xossArr); i++ {
@@ -99,8 +87,6 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, client
 	wRatio := float32(tarW) / float32(imgW)
 	hRatio := float32(tarH) / float32(imgH)
 
-	// fmt.Printf("%#v", oss_params)
-
 	if oss_params.m == "fill" {
 		if tarW > 0 && tarH > 0 {
 			if hRatio < wRatio {
@@ -108,7 +94,7 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, client
 				if err != nil {
 					utils.ErrRes(ctx, 500, "Resize")
 				}
-				Res(ctx, buffer)
+				ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 			} else {
 				buffer, err := bimg.NewImage(buffer).Enlarge(tarW, 0)
 				if err != nil {
@@ -118,7 +104,7 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, client
 				if err2 != nil {
 					utils.ErrRes(ctx, 500, "Resize")
 				}
-				Res(ctx, buffer2)
+				ResCache(ctx, buffer2, clientResdis, resizedFileInfoKey)
 			}
 		}
 	} else if oss_params.m == "fixed" {
@@ -127,21 +113,22 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, client
 			if err != nil {
 				utils.ErrRes(ctx, 500, "ForceResize")
 			}
-			Res(ctx, buffer)
+			ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 		}
 	} else {
-		if hRatio > wRatio {
+
+		if hRatio < wRatio {
 			buffer, err := bimg.NewImage(buffer).Resize(0, tarH)
 			if err != nil {
 				utils.ErrRes(ctx, 500, "Resize")
 			}
-			Res(ctx, buffer)
+			ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 		} else {
 			buffer, err := bimg.NewImage(buffer).Resize(tarW, 0)
 			if err != nil {
 				utils.ErrRes(ctx, 500, "Resize")
 			}
-			Res(ctx, buffer)
+			ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 		}
 	}
 	// Res(ctx, buffer)

@@ -21,41 +21,34 @@ import (
 )
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
-	// prevent for browser auto job
 	switch string(ctx.Path()) {
 	case
 		"/",
 		"/favicon.ico":
 		return
 	}
-	// draft.TestRequest(ctx)
-	// return
 
 	var params = getArgF(ctx.QueryArgs().Peek)
 
 	var fileShortPath = params("img")
 	var filePath = "/data/jiangzi_tupian/" + string(fileShortPath)
-	// var filePath = currentDir + "/data/jiangzi_tupian/" + string(fileShortPath)
-	// fmt.Printf("wtf: %s\n",string(params("wft")))
-	// fmt.Printf(filePath)
-	clientRedis.Set(filePath,filePath, 0)
+	var xossp = string(params("x-oss-process"))
 
-	if string(params("x-oss-process")) == "" {
+	fileStat, err := os.Stat(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if xossp == "" {
 		resize.GetFile(ctx, filePath)
 	} else {
-		resize.Resize(filePath, ctx, string(params("x-oss-process")), clientRedis)
+		resizedFileInfoKey := filePath + fmt.Sprint(fileStat.ModTime().Unix()) + xossp
+		resizedFile := clientRedis.Get(resizedFileInfoKey).Val()
+		if resizedFile != "" {
+			resize.Res(ctx, []byte(resizedFile))
+		} else {
+			resize.Resize(filePath, ctx, xossp, clientRedis, resizedFileInfoKey)
+		}
 	}
-	// fmt.Printf("Requested path is %q\n", ctx.Path())
-
-	// var oss_params = utils.GetParams(xossp)
-
-	// ctx.Write(newImage)
-	// ctx.Response.Write(fileBytes)
-	// ctx.Response.SendFile(filePath)
-	// ctx.Response.SetBody(buffer)
-	// ctx.SetContentType("application/octet-stream")
-	// ctx.SetContentType("image/jpeg")
-	// ctx.Response.Header.Set("Content-Type", "image/jpeg")
 
 	utils.UNUSED(
 		// xossp,
@@ -72,9 +65,9 @@ var (
 		Password: "",
 		DB:       0,
 	})
-	addr          = flag.String("addr", ":8089", "TCP address to listen to")
-	compress      = flag.Bool("compress", false, "Whether to enable transparent response compression")
-	currentDir, _ = os.Getwd()
+	addr     = flag.String("addr", ":8089", "TCP address to listen to")
+	compress = flag.Bool("compress", false, "Whether to enable transparent response compression")
+	// currentDir, err = os.Getwd()
 )
 
 func main() {

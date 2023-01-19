@@ -46,3 +46,7 @@ func ErrRes(ctx *fasthttp.RequestCtx, code int, err string) {
 	// 	ctx.Error("Unknow Error", fasthttp.StatusInternalServerError)
 	// }
 }
+
+func GetInfoResizeFile(filePath string,xossp string) {
+	
+}
