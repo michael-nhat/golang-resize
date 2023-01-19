@@ -16,9 +16,13 @@ import (
 
 func TestRequest(ctx *fasthttp.RequestCtx) {
 	fmt.Printf("Hdedd!\n")
+	fmt.Printf("path is %s\n", string(ctx.Path()))
 	fmt.Printf("RdequestURI is %q\n", ctx.RequestURI())
-	a := strings.Split(string(ctx.Path()),"/");
-	fmt.Printf("Requested path is %q\n", a[len(a) - 1])
+	a,b,found := strings.Cut(string(ctx.Path()), "/");
+	if b != "" && found == true {
+		fmt.Printf("Requested path is %q\n", a)
+
+	}
 	fmt.Printf("Query string is %q\n", ctx.QueryArgs().Peek("img"))
 	ctx.SetContentType("text/plain; charset=utf8")
 }

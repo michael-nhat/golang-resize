@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	// "go/printer"
 	"strings"
 
 	// "io/ioutil"
@@ -22,24 +23,25 @@ import (
 )
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	// draft.TestRequest(ctx)
 	switch string(ctx.Path()) {
 	case
 		"/",
 		"/favicon.ico":
 		return
 	}
-	// draft.TestRequest(ctx)
 
 	params := getArgF(ctx.QueryArgs().Peek)
-
-	pathArr := strings.Split(string(ctx.Path()),"/");
-	fileShortPath := pathArr[len(pathArr) -1]
-	filePath := "/data/jiangzi_tupian/" + string(fileShortPath)
+	reqPath := string(ctx.Path())
+	strTrimPath := strings.TrimPrefix(reqPath, "/")
+	_,fileShortPath,_ := strings.Cut(strTrimPath, "/");
+	filePath := "/data/jiangzi_tupian/" + fileShortPath
 	xossp := string(params("x-oss-process"))
 
 	fileStat, err := os.Stat(filePath)
 	if err != nil {
-		log.Fatal(err)
+		utils.ErrRes(ctx, 500, "wrong file " + filePath)
+		return
 	}
 	if xossp == "" {
 		resize.GetFile(ctx, filePath)
