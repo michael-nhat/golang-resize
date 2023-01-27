@@ -116,19 +116,35 @@ func Resize(filePath string, ctx *fasthttp.RequestCtx, xossString string, client
 			ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 		}
 	} else {
-
-		if hRatio < wRatio {
-			buffer, err := bimg.NewImage(buffer).Resize(0, tarH)
-			if err != nil {
-				utils.ErrRes(ctx, 500, "Resize")
+		// remain case
+		if tarW > 0 && tarH > 0 {
+			if hRatio < wRatio {
+				buffer, err := bimg.NewImage(buffer).Resize(0, tarH)
+				if err != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
+			} else {
+				buffer, err := bimg.NewImage(buffer).Resize(tarW, 0)
+				if err != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 			}
-			ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 		} else {
-			buffer, err := bimg.NewImage(buffer).Resize(tarW, 0)
-			if err != nil {
-				utils.ErrRes(ctx, 500, "Resize")
+			if wRatio > 0 {
+				buffer, err := bimg.NewImage(buffer).Resize(tarW, 0)
+				if err != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
+			} else if hRatio > 0 {
+				buffer, err := bimg.NewImage(buffer).Resize(0, tarH)
+				if err != nil {
+					utils.ErrRes(ctx, 500, "Resize")
+				}
+				ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 			}
-			ResCache(ctx, buffer, clientResdis, resizedFileInfoKey)
 		}
 	}
 	// Res(ctx, buffer)
